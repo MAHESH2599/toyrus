@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ToysRus — Dropdown UI (B2) — Testing Sandbox</title>
+<style>
+  /* ---------- Base & Layout ---------- */
+  *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif}
+  body{margin:0;background:linear-gradient(135deg,#fff7ed,#eef2ff);padding:20px;color:#0f172a}
+  .container{max-width:1100px;margin:0 auto}
+  .card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 10px 30px rgba(15,23,42,0.06);margin-bottom:16px}
+  .header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .title{font-size:20px;margin:0;color:#0b3a5b}
+  .subtitle{font-size:13px;color:#475569}
+  .badge{padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,#ff8a00,#ff4d4d);color:#fff;font-weight:700;font-size:12px}
+  .body{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-top:14px}
+  @media(max-width:940px){.body{grid-template-columns:1fr}}
+  .section{padding:12px;border-radius:10px;background:#fbfdff;border:1px solid #eef6ff}
+  .section h3{margin:0 0 8px 0;color:#0b3a5b}
+  .small{font-size:13px;color:#475569}
+  .controls{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{border:none;border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer}
+  .btn-primary{background:linear-gradient(90deg,#0ea5a4,#059669);color:white}
+  .btn-muted{background:#f1f5f9;color:#0f172a}
+  .btn-alt{background:#e2f1ff;color:#084a8a}
+  .filters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  @media(max-width:700px){.filters{grid-template-columns:1fr}}
+  select,input[type="text"]{padding:8px;border-radius:8px;border:1px solid #e6eef8;width:100%}
+  .toy-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+  @media(max-width:700px){.toy-grid{grid-template-columns:1fr}}
+  .toy{display:flex;gap:12px;padding:10px;border-radius:10px;border:1px solid #eef6ff;background:#fff;align-items:center}
+  .toy-img{width:80px;height:80px;border-radius:8px;background:#f8fafc;display:flex;align-items:center;justify-content:center;font-weight:700;color:#0b3a5b}
+  .toy-info{flex:1}
+  .toy-name{font-weight:700}
+  .toy-meta{font-size:13px;color:#64748b;margin-top:6px}
+  .price{font-weight:800;color:#065f46}
+  .result-log{margin-top:10px;max-height:260px;overflow:auto;padding:8px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff}
+  .result-item{padding:8px;border-radius:8px;margin-bottom:8px;border-left:6px solid #e2e8f0;background:#fff}
+  .result-pass{border-left-color:#10b981}
+  .result-fail{border-left-color:#ef4444}
+  .small-muted{font-size:12px;color:#64748b}
+  .reviews{max-height:180px;overflow:auto;margin-top:8px;padding:8px;border-radius:8px;background:#fff;border:1px solid #eef6ff}
+  .review-item{padding:8px;border-bottom:1px dashed #eef6ff}
+  footer{font-size:12px;color:#475569;text-align:center;margin-top:8px}
+  .flex-between{display:flex;justify-content:space-between;align-items:center}
+  .result-pill{padding:6px 10px;border-radius:999px;font-weight:700}
+  .pill-pass{background:#ecfdf5;color:#065f46}
+  .pill-fail{background:#fff1f2;color:#991b1b}
+  /* modal */
+  .modal-back{position:fixed;inset:0;background:rgba(2,6,23,0.5);display:none;align-items:center;justify-content:center;z-index:2000}
+  .modal{background:white;padding:18px;border-radius:12px;max-width:720px;width:92%;box-shadow:0 20px 40px rgba(2,6,23,0.25)}
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- Header -->
+  <div class="card header">
+    <div>
+      <h1 class="title">ToysRus — Dropdown UI (Option B2)</h1>
+      <div class="subtitle">Filters with on-screen matched toy cards · Test cases show PASS/FAIL</div>
+    </div>
+    <div style="text-align:right">
+      <div class="badge">Presentation Demo</div>
+      <div class="small-muted" style="margin-top:8px">Keep this file local; open in browser to demo</div>
+    </div>
+  </div>
+
+  <!-- Main body -->
+  <div class="card body">
+    <!-- LEFT: App -->
+    <div>
+      <!-- Play -->
+      <div class="section">
+        <h3>1. Play Feature</h3>
+        <div class="small">Click to open a toy demo / preview. Use the simulation to show PASS/FAIL.</div>
+        <div class="controls" style="margin-top:10px">
+          <button class="btn btn-primary" onclick="playFeature()">Open Play Preview</button>
+          <button class="btn btn-muted" onclick="simulatePlayFail()">Simulate Play FAIL</button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="section">
+        <h3>2. Shop by Age / Category / Brand</h3>
+        <div class="small">Choose filters and click <em>Show Toys</em>. Matching toys will appear below.</div>
+        <div class="filters" style="margin-top:8px">
+          <select id="ageSelect">
+            <option value="">-- Age Group --</option>
+            <option value="1-3">1–3 Years</option>
+            <option value="4-7">4–7 Years</option>
+            <option value="8-12">8–12 Years</option>
+          </select>
+
+          <select id="categorySelect">
+            <option value="">-- Category --</option>
+            <option value="Outdoor">Outdoor</option>
+            <option value="Educational">Educational</option>
+            <option value="Electronic">Electronic</option>
+            <option value="Puzzle">Puzzle</option>
+          </select>
+
+          <select id="brandSelect">
+            <option value="">-- Brand --</option>
+            <option value="Lego">Lego</option>
+            <option value="Barbie">Barbie</option>
+            <option value="Hot Wheels">Hot Wheels</option>
+            <option value="Fisher-Price">Fisher-Price</option>
+          </select>
+        </div>
+
+        <div style="margin-top:10px" class="controls">
+          <button class="btn btn-primary" onclick="showToys()">Show Toys</button>
+          <button class="btn btn-alt" onclick="clearFilters()">Clear Filters</button>
+          <div class="small-muted" style="margin-left:6px;align-self:center">Tip: leave filters blank to show all toys.</div>
+        </div>
+      </div>
+
+      <!-- Resulting toys -->
+      <div class="section">
+        <h3>3. Matching Toys</h3>
+        <div class="small">Cards below show matching toys for your selected filters.</div>
+        <div id="toyGrid" class="toy-grid" style="margin-top:12px">
+          <!-- toy cards populated by JS -->
+        </div>
+        <div id="noResults" class="small-muted" style="margin-top:10px;display:none">No toys matched the filters.</div>
+      </div>
+
+      <!-- Review system -->
+      <div class="section">
+        <h3>4. Review System</h3>
+        <div class="small">Add reviews, edit by index (1-based), and delete. Useful test cases included.</div>
+
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="reviewInput" type="text" placeholder="Write a review..." />
+          <input id="reviewAuthor" type="text" placeholder="Author (optional)" style="width:140px"/>
+          <button class="btn btn-alt" onclick="addReview()">Add Review</button>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="reviewIndex" type="number" placeholder="Index to edit/delete" min="1" style="width:140px"/>
+          <input id="reviewEditText" type="text" placeholder="New review text (for edit)"/>
+          <button class="btn btn-primary" onclick="editReview()">Edit</button>
+          <button class="btn btn-muted" onclick="deleteReview()">Delete</button>
+        </div>
+
+        <div class="reviews" id="reviewList" aria-live="polite">
+          <!-- reviews rendered here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Tests & Quick actions -->
+    <div>
+      <div class="section">
+        <h3>Automated Test Cases</h3>
+        <div class="small">Run tests to validate dropdown behavior, display, and review operations.</div>
+
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-alt" onclick="runFilterTests()">Filters</button>
+          <button class="btn btn-alt" onclick="runDisplayTests()">Display</button>
+          <button class="btn btn-alt" onclick="runReviewTests()">Reviews</button>
+          <button class="btn btn-primary" onclick="runAllTests()">Run ALL</button>
+        </div>
+
+        <div class="result-log" id="resultLog"></div>
+        <div class="small-muted" style="margin-top:8px">Results appear above. Green = PASS, Red = FAIL.</div>
+      </div>
+
+      <div class="section" style="margin-top:12px">
+        <h3>Quick Demo Actions</h3>
+        <div class="small">Prefill filters and reviews for quick demos/presentations.</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-muted" onclick="prefillDemo()">Prefill Demo</button>
+          <button class="btn btn-alt" onclick="clearAll()">Clear All</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Created for demo/class presentation · modify freely</footer>
+</div>
+
+<!-- Simple modal: used for summaries -->
+<div class="modal-back" id="modalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="flex-between"><h3 id="modalTitle">Summary</h3><button class="btn btn-muted" onclick="closeModal()">Close</button></div>
+    <div id="modalContent" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+/* ========= Data ========= */
+const toyCatalog = [
+  { id:'t1', name:'Lego Fire Engine', brand:'Lego', category:'Outdoor', age:'4-7', price:1299 },
+  { id:'t2', name:'Barbie Fashion Set', brand:'Barbie', category:'Educational', age:'4-7', price:899 },
+  { id:'t3', name:'Hot Wheels Track', brand:'Hot Wheels', category:'Outdoor', age:'1-3', price:499 },
+  { id:'t4', name:'Fisher-Price Smart Tablet', brand:'Fisher-Price', category:'Electronic', age:'1-3', price:799 },
+  { id:'t5', name:'World Puzzle 50pcs', brand:'Lego', category:'Puzzle', age:'8-12', price:399 },
+  { id:'t6', name:'Barbie Car', brand:'Barbie', category:'Outdoor', age:'4-7', price:699 },
+  { id:'t7', name:'Electronic Robot', brand:'Fisher-Price', category:'Electronic', age:'8-12', price:1499 }
+];
+
+/* ========= App state ========= */
+let currentDisplayed = [...toyCatalog]; // currently shown toys
+let reviews = []; // {author, text}
+
+/* ========= Util: DOM helpers ========= */
+const toyGrid = document.getElementById('toyGrid');
+const noResultsEl = document.getElementById('noResults');
+const resultLog = document.getElementById('resultLog');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalContent = document.getElementById('modalContent');
+
+function clearLog(){ resultLog.innerHTML = ''; }
+function logResult(id, message, pass){
+  const div = document.createElement('div');
+  div.className = 'result-item ' + (pass ? 'result-pass' : 'result-fail');
+  div.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>${id}</strong><div class="small-muted" style="margin-top:6px">${message}</div></div>
+    <div><span class="result-pill ${pass ? 'pill-pass':'pill-fail'}">${pass ? 'PASS':'FAIL'}</span></div>
+  </div>`;
+  resultLog.prepend(div);
+}
+
+/* ========= Render toys ========= */
+function renderToys(list){
+  toyGrid.innerHTML = '';
+  currentDisplayed = list.slice();
+  if (!list || list.length === 0) {
+    noResultsEl.style.display = 'block';
+    return;
+  }
+  noResultsEl.style.display = 'none';
+  list.forEach(t=>{
+    const d = document.createElement('div');
+    d.className = 'toy';
+    d.innerHTML = `
+      <div class="toy-img" aria-hidden="true">${t.brand.split(' ')[0].slice(0,2).toUpperCase()}</div>
+      <div class="toy-info">
+        <div class="toy-name">${t.name} <span style="font-weight:400;font-size:12px;color:#64748b">· ${t.brand}</span></div>
+        <div class="toy-meta">${t.category} · Age ${t.age} · <span class="price">₹${t.price}</span></div>
+      </div>
+    `;
+    toyGrid.appendChild(d);
+  });
+}
+
+/* ========= Filters (Dropdown behavior) ========= */
+function showToys(){
+  const age = document.getElementById('ageSelect').value;
+  const cat = document.getElementById('categorySelect').value;
+  const brand = document.getElementById('brandSelect').value;
+
+  const matched = toyCatalog.filter(t => {
+    if (age && t.age !== age) return false;
+    if (cat && t.category !== cat) return false;
+    if (brand && t.brand !== brand) return false;
+    return true;
+  });
+
+  renderToys(matched);
+  logResult('FILTER_SHOW', Applied filters (age=${age||'any'}, category=${cat||'any'}, brand=${brand||'any'}) -> shown=${matched.length}, true);
+}
+
+/* ========= Clear filters ========= */
+function clearFilters(){
+  document.getElementById('ageSelect').value = '';
+  document.getElementById('categorySelect').value = '';
+  document.getElementById('brandSelect').value = '';
+  renderToys(toyCatalog);
+  logResult('FILTER_CLEAR', 'Filters cleared; showing all toys', true);
+}
+
+/* ========= Play Feature ========= */
+function playFeature(){
+  // If toys displayed, open preview for first toy; else first in catalog
+  const toy = currentDisplayed.length ? currentDisplayed[0] : toyCatalog[0];
+  alert('PLAY: Opening preview for "'+toy.name+'". Preview loaded successfully!');
+  logResult('PLAY_OK', 'Preview opened for "'+toy.name+'"', true);
+}
+function simulatePlayFail(){
+  alert('PLAY: Failed to load preview (simulated).');
+  logResult('PLAY_FAIL', 'Preview failed to load (simulated)', false);
+}
+
+/* ========= Reviews ========= */
+function renderReviews(){
+  const el = document.getElementById('reviewList');
+  el.innerHTML = '';
+  if (reviews.length === 0) {
+    el.innerHTML = '<div class="small-muted">No reviews yet.</div>';
+    return;
+  }
+  reviews.forEach((r,i)=>{
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `<div style="display:flex;justify-content:space-between;gap:8px">
+      <div><strong>${r.author || 'Anonymous'}</strong> <span class="small-muted">· #${i+1}</span><div style="margin-top:6px">${r.text}</div></div>
+      <div style="text-align:right"><button class="btn btn-muted" onclick="prefillEdit(${i+1})">Prefill</button></div>
+    </div>`;
+    el.appendChild(div);
+  });
+}
+function addReview(){
+  const text = (document.getElementById('reviewInput').value||'').trim();
+  const author = (document.getElementById('reviewAuthor').value||'').trim();
+  if (!text) {
+    alert('FAIL: Review cannot be empty.');
+    logResult('REV_ADD_FAIL', 'Attempted to add empty review', false);
+    return;
+  }
+  reviews.push({author: author || 'Anonymous', text});
+  document.getElementById('reviewInput').value = '';
+  document.getElementById('reviewAuthor').value = '';
+  renderReviews();
+  logResult('REV_ADD_OK', Added review by "${author || 'Anonymous'}", true);
+}
+function prefillEdit(index){
+  const idx = index - 1;
+  if (!reviews[idx]) { alert('No review at index ' + index); return; }
+  document.getElementById('reviewIndex').value = index;
+  document.getElementById('reviewEditText').value = reviews[idx].text;
+}
+function editReview(){
+  const idx = Number(document.getElementById('reviewIndex').value || 0);
+  const newText = (document.getElementById('reviewEditText').value || '').trim();
+  if (!idx || idx < 1 || idx > reviews.length) {
+    alert('FAIL: Invalid review index.');
+    logResult('REV_EDIT_FAIL', 'Invalid index: '+idx, false);
+    return;
+  }
+  if (!newText) {
+    alert('FAIL: New review text cannot be empty.');
+    logResult('REV_EDIT_FAIL', 'Empty new text', false);
+    return;
+  }
+  reviews[idx-1].text = newText;
+  renderReviews();
+  logResult('REV_EDIT_OK', 'Edited review #'+idx, true);
+}
+function deleteReview(){
+  const idx = Number(document.getElementById('reviewIndex').value || 0);
+  if (!idx || idx < 1 || idx > reviews.length) {
+    alert('FAIL: Invalid review index.');
+    logResult('REV_DELETE_FAIL', 'Invalid index: '+idx, false);
+    return;
+  }
+  reviews.splice(idx-1,1);
+  renderReviews();
+  logResult('REV_DELETE_OK', 'Deleted review #'+idx, true);
+}
+
+/* ========= Quick demo actions ========= */
+function prefillDemo(){
+  document.getElementById('ageSelect').value = '4-7';
+  document.getElementById('categorySelect').value = '';
+  document.getElementById('brandSelect').value = '';
+  showToys();
+  // add a review
+  reviews = [{author:'DemoUser', text:'Nice toy selection!'}];
+  renderReviews();
+  logResult('PREFILL', 'Demo filters and review prefilled', true);
+}
+function clearAll(){
+  clearFilters();
+  reviews = [];
+  renderReviews();
+  clearLog();
+  logResult('CLEAR', 'Cleared filters, reviews and logs', true);
+}
+
+/* ========= Modal helpers ========= */
+function openModal(text){
+  modalContent.innerText = text;
+  modalBackdrop.style.display = 'flex';
+}
+function closeModal(){ modalBackdrop.style.display = 'none'; }
+
+/* ========= Automated Tests ========= */
+
+/* FILTER tests:
+   - F1: No selection -> show all (PASS)
+   - F2: Select age '1-3' -> expect >=1 result (PASS if >=1)
+   - F3: Select brand 'Barbie' + category 'Electronic' -> expect 0 (PASS if 0)
+*/
+function runFilterTests(){
+  resultLogPrep('Running Filter Tests...');
+  // F1
+  document.getElementById('ageSelect').value = '';
+  document.getElementById('categorySelect').value = '';
+  document.getElementById('brandSelect').value = '';
+  showToys();
+  const shownAll = currentDisplayed.length;
+  logResult('F1_NO_FILTER', No filters -> expect ${toyCatalog.length} shown: got ${shownAll}, shownAll === toyCatalog.length);
+
+  // F2
+  document.getElementById('ageSelect').value = '1-3';
+  document.getElementById('categorySelect').value = '';
+  document.getElementById('brandSelect').value = '';
+  showToys();
+  const count13 = currentDisplayed.length;
+  logResult('F2_AGE_1_3', Filter age 1-3 -> expect >=1: got ${count13}, count13 >= 1);
+
+  // F3
+  document.getElementById('ageSelect').value = '';
+  document.getElementById('categorySelect').value = 'Electronic';
+  document.getElementById('brandSelect').value = 'Barbie';
+  showToys();
+  const countMismatch = currentDisplayed.length;
+  logResult('F3_BRAND_CAT_MISMATCH', Brand Barbie + Category Electronic -> expect 0: got ${countMismatch}, countMismatch === 0);
+
+  openModal('Filter tests finished. Check result panel for details.');
+}
+
+/* DISPLAY tests:
+   - D1: After selecting age 4-7, ensure each displayed toy has age '4-7' (PASS if all)
+   - D2: Clear filters -> all toys shown
+*/
+function runDisplayTests(){
+  resultLogPrep('Running Display Tests...');
+  // D1
+  document.getElementById('ageSelect').value = '4-7';
+  document.getElementById('categorySelect').value = '';
+  document.getElementById('brandSelect').value = '';
+  showToys();
+  const allMatchAge = currentDisplayed.every(t => t.age === '4-7');
+  logResult('D1_DISPLAY_AGE_MATCH', All displayed toys have age 4-7: ${currentDisplayed.length} shown, allMatchAge);
+
+  // D2
+  clearFilters();
+  const allShown = currentDisplayed.length === toyCatalog.length;
+  logResult('D2_CLEAR_SHOW_ALL', Clear filters -> expect ${toyCatalog.length} shown: got ${currentDisplayed.length}, allShown);
+
+  openModal('Display tests finished.');
+}
+
+/* REVIEW tests:
+   - R1: Add empty review -> FAIL
+   - R2: Add valid review -> PASS
+   - R3: Edit invalid index -> FAIL
+   - R4: Edit valid -> PASS
+   - R5: Delete valid -> PASS
+*/
+function runReviewTests(){
+  resultLogPrep('Running Review Tests...');
+  reviews = [];
+  renderReviews();
+
+  // R1 empty add
+  document.getElementById('reviewInput').value = '';
+  addReview(); // will log inside as fail
+
+  // R2 add valid
+  document.getElementById('reviewInput').value = 'Lovely toys!';
+  document.getElementById('reviewAuthor').value = 'Tester';
+  addReview();
+  logResult('R2_ADD_VALID', 'Review count should be 1', reviews.length === 1);
+
+  // R3 edit invalid
+  document.getElementById('reviewIndex').value = 5;
+  document.getElementById('reviewEditText').value = 'X';
+  editReview(); // logs failure inside
+  // R4 edit valid
+  document.getElementById('reviewIndex').value = 1;
+  document.getElementById('reviewEditText').value = 'Updated review text';
+  editReview();
+  logResult('R4_EDIT_VALID', 'Review #1 text updated', reviews[0] && reviews[0].text === 'Updated review text');
+
+  // R5 delete valid
+  document.getElementById('reviewIndex').value = 1;
+  deleteReview();
+  logResult('R5_DELETE_VALID', 'Review list should be empty', reviews.length === 0);
+
+  openModal('Review tests finished.');
+}
+
+/* Run All */
+function runAllTests(){
+  clearLog();
+  runFilterTests();
+  runDisplayTests();
+  runReviewTests();
+  openModal('All tests executed. Check the results pane for PASS/FAIL details.');
+}
+
+/* helper to create a heading in log */
+function resultLogPrep(title){
+  const n = document.createElement('div');
+  n.className = 'result-item';
+  n.style.borderLeft = '6px solid #cbd5e1';
+  n.style.background = '#f8fafc';
+  n.innerHTML = <strong>${title}</strong><div class="small-muted" style="margin-top:6px">Auto-run</div>;
+  resultLog.prepend(n);
+}
+
+/* clear log wrapper */
+function clearLog(){ resultLog.innerHTML = ''; }
+
+/* ========= Initialization ========= */
+renderToys(toyCatalog);
+renderReviews();
+
+</script>
+</body>
+</html>
